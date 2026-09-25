@@ -62,11 +62,13 @@ export function requireRole(userRole: UserRole, required: UserRole): NextRespons
 }
 
 /**
- * Validates the CRON_SECRET header for cron routes.
+ * Validates the CRON_SECRET header for cron routes. With no CRON_SECRET set,
+ * nothing gets in: the comparison alone would have let "Bearer undefined" through.
  */
 export function validateCronSecret(request: Request): NextResponse | null {
+  const secret = process.env.CRON_SECRET
   const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret || auth !== `Bearer ${secret}`) {
     return NextResponse.json(apiError('Unauthorized'), { status: 401 })
   }
   return null
