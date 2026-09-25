@@ -35,15 +35,15 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // Public routes that don't require a user session.
+  // Public routes that don't require a user session. / is the landing page.
   // /api/webhooks is verified by Twilio signature; /api/cron by CRON_SECRET bearer token.
   const publicPaths = ['/setup', '/invite', '/api/webhooks', '/api/cron', '/api/v1/auth']
-  const isPublic = publicPaths.some((p) => pathname.startsWith(p))
+  const isPublic = pathname === '/' || publicPaths.some((p) => pathname.startsWith(p))
 
   // There is no login screen. The old /login address goes to the dashboard.
   if (pathname === '/login') {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 

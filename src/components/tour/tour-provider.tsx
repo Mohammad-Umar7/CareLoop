@@ -134,7 +134,7 @@ export function TourProvider({ enabled, children }: { enabled: boolean; children
       },
       start: () => {
         tour.start()
-        if (window.location.pathname !== '/') router.push('/')
+        if (window.location.pathname !== '/dashboard') router.push('/dashboard')
       },
       resume: () => {
         tour.resume()

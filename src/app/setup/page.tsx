@@ -69,7 +69,7 @@ export default function SetupPage() {
           </>
         )}
 
-        <Link href="/" className="inline-block font-medium text-brand underline underline-offset-2">Try again</Link>
+        <Link href="/dashboard" className="inline-block font-medium text-brand underline underline-offset-2">Try again</Link>
       </div>
     </main>
   )
