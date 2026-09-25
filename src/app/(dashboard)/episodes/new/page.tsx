@@ -106,6 +106,15 @@ export default function NewEpisodePage() {
   const [dragOver, setDragOver] = useState(false)
   /** A demo letter is being dragged: the box says where to drop it. */
   const [sampleDragging, setSampleDragging] = useState(false)
+  // The tile's own dragend can't be trusted: the drop starts the reading, which
+  // disables the tiles, and a disabled button gets no dragend. Any drag that
+  // ends anywhere on the page ends this one.
+  useEffect(() => {
+    const end = () => { setSampleDragging(false); setDragOver(false) }
+    window.addEventListener('dragend', end)
+    window.addEventListener('drop', end)
+    return () => { window.removeEventListener('dragend', end); window.removeEventListener('drop', end) }
+  }, [])
   const [readError, setReadError] = useState<string | null>(null)
   /** "sample" when the AI reader was unavailable and a sample letter's built-in reading filled the form. */
   const [readBy, setReadBy] = useState<'ai' | 'sample' | null>(null)
@@ -353,6 +362,7 @@ export default function NewEpisodePage() {
                 onDrop={(e) => {
                   e.preventDefault()
                   setDragOver(false)
+                  setSampleDragging(false)
                   const sample = e.dataTransfer.getData(SAMPLE_LETTER_DRAG_TYPE)
                   if (sample) { void readSampleLetter(sample); return }
                   const f = e.dataTransfer.files[0]
