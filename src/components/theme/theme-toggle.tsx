@@ -30,11 +30,13 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   const current = mounted ? (resolvedTheme ?? 'light') : 'light'
   const Icon = !mounted ? Monitor : current === 'dark' ? Moon : Sun
+  // The stored preference is only readable on the client; the server renders 'system'.
+  const preference = mounted ? (theme ?? 'system') : 'system'
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Theme: ${theme ?? 'system'}. Change theme`}
+        aria-label={`Theme: ${preference}. Change theme`}
         title="Theme"
         className={cn(
           'inline-flex h-10 w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-200',
@@ -47,7 +49,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       <DropdownMenuContent align="end" className="w-40">
         {OPTIONS.map((opt) => {
           const OptIcon = opt.icon
-          const selected = (theme ?? 'system') === opt.value
+          const selected = preference === opt.value
           return (
             <DropdownMenuItem
               key={opt.value}
