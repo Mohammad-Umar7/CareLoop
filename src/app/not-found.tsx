@@ -16,7 +16,7 @@ export default function NotFound() {
           </p>
         </div>
         <div className="flex gap-3 justify-center">
-          <Link href="/">
+          <Link href="/dashboard">
             <Button style={{ backgroundColor: 'var(--brand)' }}>Go to dashboard</Button>
           </Link>
           <Link href="/patients">

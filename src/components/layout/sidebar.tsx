@@ -22,7 +22,7 @@ export interface NavItem {
 
 /** The everyday screens, in the order a nurse reaches for them. Settings sits apart, at the bottom. */
 export const NAV_ITEMS: NavItem[] = [
-  { label: 'Overview', href: '/', icon: LayoutDashboard },
+  { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Patients', href: '/patients', icon: Users, alsoActiveOn: ['/episodes'] },
   { label: 'Alerts', href: '/alerts', icon: Bell },
   { label: 'Appointments', href: '/appointments', icon: Calendar },
@@ -32,7 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const SETTINGS_ITEM: NavItem = { label: 'Settings', href: '/settings', icon: Settings }
 
 export function isNavActive(pathname: string, item: NavItem) {
-  if (item.href === '/') return pathname === '/'
+  if (item.href === '/dashboard') return pathname === '/dashboard'
   return [item.href, ...(item.alsoActiveOn ?? [])].some((p) => pathname === p || pathname.startsWith(`${p}/`))
 }
 
