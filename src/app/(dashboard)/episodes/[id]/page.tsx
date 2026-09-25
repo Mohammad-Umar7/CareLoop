@@ -13,7 +13,7 @@ import { EpisodeTimeline } from '@/components/patients/episode-timeline'
 import { ConversationTranscript, type TranscriptMessage, type SharedNumberPatient } from '@/components/patients/conversation-transcript'
 import { summariseNumberSession } from '@/lib/whatsapp/number-session'
 import { countCheckinAnswers } from '@/lib/analytics/checkins'
-import { ArrowLeft, Pencil, Pill, AlertTriangle, ChevronRight, CalendarDays, FileText, MessageCircle, ClipboardList, History, Upload, Send } from 'lucide-react'
+import { ArrowLeft, Pencil, Pill, AlertTriangle, ChevronRight, CalendarDays, FileText, MessageCircle, ClipboardList, History, Upload, Send, Download } from 'lucide-react'
 import { fmt } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { readConversationState } from '@/lib/whatsapp/fsm'
@@ -77,7 +77,7 @@ export default async function EpisodeDetailPage({
           medications(*),
           follow_up_requirements(*)
         ),
-        discharge_documents(id, original_filename, created_at),
+        discharge_documents(id, original_filename, storage_path, created_at),
         alerts(id, type, severity, status, created_at)
       `)
       .eq('id', id)
@@ -142,7 +142,13 @@ export default async function EpisodeDetailPage({
     emergency_symptoms: string[]; lifestyle_instructions: string[]; restrictions: string[]; activities: string[];
     medications: Medication[]; follow_up_requirements: FollowUpRequirement[]
   } | null
-  const documents = (episode.discharge_documents ?? []) as { id: string; original_filename: string; created_at: string }[]
+  const storedDocuments = (episode.discharge_documents ?? []) as { id: string; original_filename: string; storage_path: string; created_at: string }[]
+  // A download link per letter, good for an hour; the bucket's policy limits it to the nurse's hospital.
+  const documents = await Promise.all(storedDocuments.map(async (doc) => {
+    const { data } = await supabase.storage.from('discharge-documents')
+      .createSignedUrl(doc.storage_path, 60 * 60, { download: doc.original_filename })
+    return { ...doc, url: data?.signedUrl ?? null }
+  }))
   const openAlerts = ((episode.alerts ?? []) as (PatientAlert & { status: string })[]).filter((a) => a.status === 'open')
 
   // At a glance
@@ -461,7 +467,14 @@ export default async function EpisodeDetailPage({
                         <ul className="space-y-1">
                           {documents.map((doc) => (
                             <li key={doc.id} className="text-sm">
-                              <span className="block truncate font-medium" title={doc.original_filename}>{doc.original_filename}</span>
+                              {doc.url ? (
+                                <a href={doc.url} className="flex items-center gap-1.5 font-medium text-brand hover:underline" title={`Download ${doc.original_filename}`}>
+                                  <Download className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                                  <span className="truncate">{doc.original_filename}</span>
+                                </a>
+                              ) : (
+                                <span className="block truncate font-medium" title={doc.original_filename}>{doc.original_filename}</span>
+                              )}
                               <span className="text-xs text-muted-foreground">Uploaded {fmt(doc.created_at, 'd MMM yyyy', tz)}</span>
                             </li>
                           ))}
