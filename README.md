@@ -422,7 +422,7 @@ scripts/
 ## Local development
 
 ```bash
-git clone https://github.com/FuadAhamed91/CareLoop.git CareLoop
+git clone https://github.com/Mohammad-Umar7/CareLoop.git CareLoop
 cd CareLoop
 npm install
 cp .env.example .env.local     # then fill it in — see below
