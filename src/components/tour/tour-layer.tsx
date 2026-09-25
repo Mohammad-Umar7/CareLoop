@@ -171,6 +171,9 @@ export function TourLayer(props: TourLayerProps) {
         const from = visibleBox(step.drag.from)
         const to = visibleBox(step.drag.to)
         setDrag((prev) => (from && to ? (prev && sameBox(prev.from, from) && sameBox(prev.to, to) ? prev : { from, to }) : null))
+      } else {
+        // The letter went in and the step moved on: the demo must not keep flying over the next one.
+        setDrag((prev) => (prev ? null : prev))
       }
       // A menu or dialog of the page's own is open: let every click through to it.
       const open = !!document.querySelector('[role="listbox"], [role="menu"], [data-slot="select-content"]')
@@ -290,7 +293,7 @@ export function TourLayer(props: TourLayerProps) {
           style={{ left: hole.left + hole.width - 24, top: hole.top + hole.height - 16 }}
         />
       )}
-      {drag && !waiting && <DragDemo from={drag.from} to={drag.to} label={step.drag?.label ?? ''} />}
+      {step.drag && drag && !waiting && <DragDemo from={drag.from} to={drag.to} label={step.drag?.label ?? ''} />}
 
       {/* The card */}
       <div
